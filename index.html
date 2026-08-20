@@ -259,13 +259,15 @@
                 height: auto;
             }
 
-            /* Minimalist Footer Text */
+            /* Minimalist Footer Text - JS positions `top` to sit 15px below
+               the logo; `bottom` is a pre-JS fallback. */
             .footer-text {
                 /* display: none; */
                 position: absolute;
                 bottom: 40px;
                 left: 50%;
                 transform: translateX(-50%);
+                white-space: nowrap;
                 color: #ffffff;
                 letter-spacing: 6px;
                 font-size: 12px;
@@ -324,7 +326,9 @@
                 <img src="roze-ventures-logo-boxed.png" alt="Roze Ventures Logo" class="logo-img" />
             </div>
 
-            <!-- Footer Intrigue -->
+            <!-- Footer Intrigue - positioned 15px below the logo via JS so it
+                 stays a sibling of the fluid halves and keeps the split
+                 black/white mix-blend-mode effect. -->
             <div class="footer-text">Roze Ventures</div>
         </div>
 
@@ -337,7 +341,7 @@
                Dial these to taste; they map straight onto shader uniforms.
                =============================================================== */
             var CONFIG = {
-                speed:       0.05,  // overall flow rate. higher = more aggressive
+                speed:       0.04,  // overall flow rate. higher = more aggressive
                 scale:       0.50,  // pattern zoom. lower = larger, lazier forms
                 warp:        5.00,  // domain-warp strength. THIS is the swirl.
                 veinFreq:    0.75,  // how many vein bands fold through the field
@@ -605,6 +609,38 @@
             });
 
             window.RozeFluid = { config: CONFIG, uniforms: U, gl: gl, program: prog };
+        })();
+        </script>
+
+        <script>
+        /* Keep the footer text 15px below the logo. The text stays a sibling
+           of the fluid halves (not a child of .logo-container) so its
+           mix-blend-mode: difference still splits black/white against the
+           light/dark background instead of being isolated by the logo's
+           stacking context. */
+        (function () {
+            'use strict';
+            var GAP = 15;
+            var logo = document.querySelector('.logo-container');
+            var footer = document.querySelector('.footer-text');
+            var img = logo && logo.querySelector('img');
+            if (!logo || !footer) { return; }
+
+            function position() {
+                var logoRect = logo.getBoundingClientRect();
+                var parentRect = footer.offsetParent
+                    ? footer.offsetParent.getBoundingClientRect()
+                    : { top: 0 };
+                footer.style.bottom = 'auto';
+                footer.style.top = (logoRect.bottom - parentRect.top + GAP) + 'px';
+            }
+
+            window.addEventListener('resize', position);
+            if (img && !img.complete) {
+                img.addEventListener('load', position);
+                img.addEventListener('error', position);
+            }
+            position();
         })();
         </script>
     </body>
