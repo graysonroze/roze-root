@@ -337,14 +337,14 @@
                Dial these to taste; they map straight onto shader uniforms.
                =============================================================== */
             var CONFIG = {
-                speed:       0.03,  // overall flow rate. higher = more aggressive
+                speed:       0.05,  // overall flow rate. higher = more aggressive
                 scale:       0.50,  // pattern zoom. lower = larger, lazier forms
                 warp:        5.00,  // domain-warp strength. THIS is the swirl.
-                veinFreq:    1.50,  // how many vein bands fold through the field
-                veinSharp:   1.50,  // vein thinness. higher = finer, harder edges
-                veinLight:   0.35,  // vein strength, pearl side
-                veinDark:    0.25,  // vein strength, ink side
-                contrast:    2.0   // tonal separation
+                veinFreq:    0.75,  // how many vein bands fold through the field
+                veinSharp:   0.25,  // vein thinness. higher = finer, harder edges
+                veinLight:   0.03,  // vein strength, pearl side
+                veinDark:    0.08,  // vein strength, ink side
+                contrast:    1.25   // tonal separation
             };
 
             var canvas = document.getElementById('fluid-canvas');
