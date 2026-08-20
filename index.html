@@ -5,32 +5,126 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="description" content="Welcome to Roze Ventures" />
+        
         <link rel="shortcut icon" href="https://rozeventures.com/favicon.gif" type="image/gif" />
         <link rel="apple-touch-icon" href="https://rozeventures.com/apple-touch-icon.webp" />
 
         <!-- PAGE TITLE -->
         <title>Roze Ventures</title>
 
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
+
         <style>
-            html, body {
-                height: 100%;
+            body, html {
                 margin: 0;
+                padding: 0;
+                height: 100%;
+                width: 100%;
+                overflow: hidden;
+                font-family: 'Barlow Condensed', 'Roboto Condensed', sans-serif;
+                background-color: #000;
             }
-            body {
+    
+            .container {
                 display: flex;
-                align-items: center;
-                justify-content: center;
-                min-height: 100vh;
-                background: linear-gradient(to bottom, #ffffff, #f2f5f7);
+                height: 100vh;
+                width: 100vw;
+                position: relative;
             }
-            .logo-img {
-                width: min(30vw, 140px);
-                height: auto;
+    
+            /* Left Side - Light Kinetic Fluid */
+            .left-half {
+                flex: 1;
+                background: 
+                    radial-gradient(circle at 20% 30%, #ffffff 0%, transparent 50%),
+                    radial-gradient(circle at 80% 80%, #d4d4d4 0%, transparent 50%),
+                    radial-gradient(circle at 50% 50%, #e8e8e8 0%, transparent 50%),
+                    #f5f5f5;
+                background-size: 150% 150%;
+                animation: moveFluidsLight 15s ease-in-out infinite alternate;
+                position: relative;
+            }
+    
+            /* Right Side - Dark Kinetic Fluid */
+            .right-half {
+                flex: 1;
+                background: 
+                    radial-gradient(circle at 20% 30%, #333333 0%, transparent 50%),
+                    radial-gradient(circle at 80% 80%, #000000 0%, transparent 50%),
+                    radial-gradient(circle at 50% 50%, #1a1a1a 0%, transparent 50%),
+                    #050505;
+                background-size: 150% 150%;
+                animation: moveFluidsDark 15s ease-in-out infinite alternate;
+                position: relative;
+            }
+    
+            /* Animations for the fluid movement */
+            @keyframes moveFluidsLight {
+                0% { background-position: 0% 0%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 50% 100%; }
+            }
+    
+            @keyframes moveFluidsDark {
+                0% { background-position: 100% 100%; }
+                50% { background-position: 0% 50%; }
+                100% { background-position: 50% 0%; }
+            }
+    
+            /* Center Logo Container */
+            .logo-container {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                z-index: 10;
+                /* A subtle shadow to separate the logo block from the fluid background */
+                box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: transparent;
+            }
+    
+            .logo-container img.logo-img {
                 display: block;
+                width: 150px;
+                max-width: 30vw;
+                height: auto;
+            }
+    
+            /* Minimalist Footer Text */
+            .footer-text {
+                display: none;
+                position: absolute;
+                bottom: 40px;
+                left: 50%;
+                transform: translateX(-50%);
+                color: #ffffff;
+                letter-spacing: 6px;
+                font-size: 12px;
+                text-transform: uppercase;
+                z-index: 20;
+                mix-blend-mode: difference; /* Ensures text is visible across both light and dark backgrounds */
+                pointer-events: none;
             }
         </style>
     </head>
     <body>
-        <img src="roze-ventures-logo-boxed.png" alt="Roze Ventures Logo" class="logo-img" />
+        <div class="container">
+            <!-- Split Fluid Backgrounds -->
+            <div class="left-half"></div>
+            <div class="right-half"></div>
+
+            <!-- Centered Logo -->
+            <div class="logo-container">
+                <img src="roze-ventures-logo-boxed.png" alt="Roze Ventures Logo" class="logo-img" />
+            </div>
+
+            <!-- Footer Intrigue -->
+            <div class="footer-text">Roze Ventures</div>
+        </div>
     </body>
 </html>
