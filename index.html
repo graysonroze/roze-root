@@ -5,7 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="description" content="Welcome to Roze Ventures" />
-        
+
         <link rel="shortcut icon" href="https://rozeventures.com/favicon.gif" type="image/gif" />
         <link rel="apple-touch-icon" href="https://rozeventures.com/apple-touch-icon.webp" />
 
@@ -26,53 +26,217 @@
                 font-family: 'Barlow Condensed', 'Roboto Condensed', sans-serif;
                 background-color: #000;
             }
-    
+
             .container {
                 display: flex;
                 height: 100vh;
+                height: 100dvh; /* avoids the mobile URL-bar jump */
                 width: 100vw;
                 position: relative;
             }
-    
-            /* Left Side - Light Kinetic Fluid */
-            .left-half {
+
+            /* ---------------------------------------------------------------
+               THE SPLIT CANVAS
+               Each half clips its own fluid field, so the centre seam stays
+               perfectly crisp no matter how far the blobs drift.
+               --------------------------------------------------------------- */
+            .half {
                 flex: 1;
-                background: 
-                    radial-gradient(circle at 20% 30%, #ffffff 0%, transparent 50%),
-                    radial-gradient(circle at 80% 80%, #d4d4d4 0%, transparent 50%),
-                    radial-gradient(circle at 50% 50%, #e8e8e8 0%, transparent 50%),
-                    #f5f5f5;
-                background-size: 150% 150%;
-                animation: moveFluidsLight 15s ease-in-out infinite alternate;
                 position: relative;
+                overflow: hidden;
             }
-    
-            /* Right Side - Dark Kinetic Fluid */
-            .right-half {
-                flex: 1;
-                background: 
-                    radial-gradient(circle at 20% 30%, #333333 0%, transparent 50%),
-                    radial-gradient(circle at 80% 80%, #000000 0%, transparent 50%),
-                    radial-gradient(circle at 50% 50%, #1a1a1a 0%, transparent 50%),
-                    #050505;
-                background-size: 150% 150%;
-                animation: moveFluidsDark 15s ease-in-out infinite alternate;
-                position: relative;
+
+            .left-half  { background-color: #e9e7e3; }
+            .right-half { background-color: #060607; }
+
+            /* The field is the blend surface. `isolation` keeps the blobs'
+               mix-blend-modes from reaching through to the page behind. */
+            .fluid {
+                position: absolute;
+                inset: 0;
+                isolation: isolate;
             }
-    
-            /* Animations for the fluid movement */
-            @keyframes moveFluidsLight {
-                0% { background-position: 0% 0%; }
-                50% { background-position: 100% 50%; }
-                100% { background-position: 50% 100%; }
+            .left-half  .fluid { background-color: #e9e7e3; }
+            .right-half .fluid { background-color: #060607; }
+
+            /* ---------------------------------------------------------------
+               KINETIC FLUID LAYERS
+               Every blob is its own element with its own transform animation,
+               so the layers genuinely drift past and through one another.
+               Each blob is blurred once and then only ever transformed, which
+               keeps the whole thing on the compositor.
+               --------------------------------------------------------------- */
+            .blob {
+                position: absolute;
+                will-change: transform;
+                transform-origin: 50% 50%;
+                backface-visibility: hidden;
             }
-    
-            @keyframes moveFluidsDark {
-                0% { background-position: 100% 100%; }
-                50% { background-position: 0% 50%; }
-                100% { background-position: 50% 0%; }
+
+            /* ---------- LEFT: pearlescent ---------- */
+            .left-half .blob  { filter: blur(55px); }
+
+            .l1 {
+                width: 105vw; height: 85vh; top: -22%; left: -38%;
+                background: radial-gradient(ellipse 58% 46% at 42% 44%, #ffffff 0%, rgba(255,255,255,0) 68%);
+                animation: driftA 26s ease-in-out infinite;
             }
-    
+            .l2 {
+                width: 95vw; height: 95vh; top: 12%; left: -30%;
+                background: radial-gradient(ellipse 55% 50% at 55% 50%, #c3c0c4 0%, rgba(195,192,196,0) 70%);
+                mix-blend-mode: multiply;
+                animation: driftB 34s ease-in-out infinite;
+            }
+            .l3 {
+                width: 88vw; height: 78vh; top: -12%; left: -8%;
+                background: radial-gradient(ellipse 52% 44% at 48% 52%, #fff2e0 0%, rgba(255,242,224,0) 66%);
+                mix-blend-mode: soft-light;
+                animation: driftC 21s ease-in-out infinite;
+            }
+            .l4 {
+                width: 92vw; height: 88vh; top: 20%; left: -22%;
+                background: radial-gradient(ellipse 50% 42% at 52% 46%, #d5e0ef 0%, rgba(213,224,239,0) 68%);
+                mix-blend-mode: multiply;
+                animation: driftD 39s ease-in-out infinite;
+            }
+            .l5 {
+                width: 70vw; height: 62vh; top: 34%; left: 6%;
+                background: radial-gradient(ellipse 48% 40% at 46% 50%, #ffffff 0%, rgba(255,255,255,0) 64%);
+                animation: driftE 29s ease-in-out infinite;
+            }
+
+            /* ---------- RIGHT: charcoal liquid ---------- */
+            .right-half .blob { filter: blur(60px); }
+
+            .d1 {
+                width: 100vw; height: 88vh; top: -18%; left: -30%;
+                background: radial-gradient(ellipse 56% 46% at 44% 46%, #4a4a52 0%, rgba(74,74,82,0) 68%);
+                mix-blend-mode: screen;
+                animation: driftB 28s ease-in-out infinite;
+            }
+            .d2 {
+                width: 92vw; height: 92vh; top: 8%; left: -14%;
+                background: radial-gradient(ellipse 52% 48% at 54% 50%, #26262c 0%, rgba(38,38,44,0) 70%);
+                mix-blend-mode: screen;
+                animation: driftD 36s ease-in-out infinite;
+            }
+            .d3 {
+                width: 66vw; height: 58vh; top: 28%; left: 4%;
+                background: radial-gradient(ellipse 46% 38% at 48% 48%, #6e6e7c 0%, rgba(110,110,124,0) 62%);
+                mix-blend-mode: screen;
+                animation: driftA 23s ease-in-out infinite;
+            }
+            .d4 {
+                width: 96vw; height: 80vh; top: 24%; left: -34%;
+                background: radial-gradient(ellipse 54% 44% at 50% 50%, #000000 0%, rgba(0,0,0,0) 66%);
+                mix-blend-mode: multiply;
+                animation: driftC 31s ease-in-out infinite;
+            }
+            .d5 {
+                width: 74vw; height: 66vh; top: -8%; left: 10%;
+                background: radial-gradient(ellipse 44% 40% at 50% 46%, #34343d 0%, rgba(52,52,61,0) 64%);
+                mix-blend-mode: screen;
+                animation: driftE 42s ease-in-out infinite;
+            }
+
+            /* ---------------------------------------------------------------
+               IRIDESCENT SHEEN
+               A slowly rotating conic gradient. This is what sells "pearl"
+               on the light side and "polished stone" on the dark side.
+               --------------------------------------------------------------- */
+            .sheen {
+                position: absolute;
+                inset: -30%;
+                will-change: transform;
+                animation: spin 60s linear infinite;
+            }
+            .left-half .sheen {
+                background: conic-gradient(from 0deg,
+                    rgba(255,209,222,0.60), rgba(210,228,255,0.60),
+                    rgba(255,246,214,0.60), rgba(226,212,255,0.55),
+                    rgba(255,209,222,0.60));
+                mix-blend-mode: overlay;
+                filter: blur(85px);
+                opacity: 0.55;
+            }
+            .right-half .sheen {
+                background: conic-gradient(from 180deg,
+                    rgba(120,130,160,0.40), rgba(70,70,80,0.20),
+                    rgba(150,140,130,0.35), rgba(60,60,72,0.20),
+                    rgba(120,130,160,0.40));
+                mix-blend-mode: overlay;
+                filter: blur(95px);
+                opacity: 0.7;
+                animation-direction: reverse;
+                animation-duration: 75s;
+            }
+
+            /* ---------------------------------------------------------------
+               DRIFT KEYFRAMES
+               Closed loops (0% and 100% match) so the motion never eases to a
+               dead stop the way an `alternate` cycle does. Durations are
+               deliberately non-harmonic (21/23/26/29/31/34/36/39/42s) so the
+               layers never resynchronise into a visible repeat.
+               --------------------------------------------------------------- */
+            @keyframes driftA {
+                0%   { transform: translate3d(-6%, -4%, 0) scale(1.00) rotate(0deg); }
+                25%  { transform: translate3d(7%, 5%, 0)   scale(1.18) rotate(90deg); }
+                50%  { transform: translate3d(4%, -7%, 0)  scale(0.94) rotate(180deg); }
+                75%  { transform: translate3d(-8%, 6%, 0)  scale(1.12) rotate(270deg); }
+                100% { transform: translate3d(-6%, -4%, 0) scale(1.00) rotate(360deg); }
+            }
+            @keyframes driftB {
+                0%   { transform: translate3d(5%, 6%, 0)   scale(1.10) rotate(0deg); }
+                25%  { transform: translate3d(-7%, -3%, 0) scale(0.92) rotate(-90deg); }
+                50%  { transform: translate3d(-3%, 8%, 0)  scale(1.22) rotate(-180deg); }
+                75%  { transform: translate3d(8%, -5%, 0)  scale(1.02) rotate(-270deg); }
+                100% { transform: translate3d(5%, 6%, 0)   scale(1.10) rotate(-360deg); }
+            }
+            @keyframes driftC {
+                0%   { transform: translate3d(-4%, 7%, 0)  scale(1.15) rotate(0deg); }
+                33%  { transform: translate3d(9%, -6%, 0)  scale(0.96) rotate(120deg); }
+                66%  { transform: translate3d(-9%, -2%, 0) scale(1.24) rotate(240deg); }
+                100% { transform: translate3d(-4%, 7%, 0)  scale(1.15) rotate(360deg); }
+            }
+            @keyframes driftD {
+                0%   { transform: translate3d(6%, -5%, 0)  scale(0.98) rotate(0deg); }
+                33%  { transform: translate3d(-8%, 4%, 0)  scale(1.20) rotate(-120deg); }
+                66%  { transform: translate3d(3%, 9%, 0)   scale(1.06) rotate(-240deg); }
+                100% { transform: translate3d(6%, -5%, 0)  scale(0.98) rotate(-360deg); }
+            }
+            @keyframes driftE {
+                0%   { transform: translate3d(0%, 0%, 0)   scale(1.06) rotate(0deg); }
+                50%  { transform: translate3d(-10%, 8%, 0) scale(1.28) rotate(180deg); }
+                100% { transform: translate3d(0%, 0%, 0)   scale(1.06) rotate(360deg); }
+            }
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to   { transform: rotate(360deg); }
+            }
+
+
+            /* ---------------------------------------------------------------
+               THE FLUID CANVAS
+               A WebGL shader draws the marbling. It sits above the CSS blob
+               layers, which remain as a no-JS / no-WebGL fallback.
+               --------------------------------------------------------------- */
+            #fluid-canvas {
+                position: absolute;
+                inset: 0;
+                width: 100%;
+                height: 100%;
+                display: block;
+                z-index: 5;
+                opacity: 0;
+                transition: opacity 900ms ease;
+                pointer-events: none;
+            }
+            #fluid-canvas.ready { opacity: 1; }
+
+            /* Once the shader is live, shut the CSS fallback animations down
+               entirely - they would burn GPU under an opaque canvas. */
+            .container.gl-active .fluid { display: none; }
+
             /* Center Logo Container */
             .logo-container {
                 position: absolute;
@@ -87,17 +251,17 @@
                 align-items: center;
                 background-color: transparent;
             }
-    
+
             .logo-container img.logo-img {
                 display: block;
-                width: 150px;
-                max-width: 30vw;
+                width: 100px;
+                max-width: 20vw;
                 height: auto;
             }
-    
+
             /* Minimalist Footer Text */
             .footer-text {
-                display: none;
+                /* display: none; */
                 position: absolute;
                 bottom: 40px;
                 left: 50%;
@@ -110,13 +274,50 @@
                 mix-blend-mode: difference; /* Ensures text is visible across both light and dark backgrounds */
                 pointer-events: none;
             }
+
+            /* Lighter blur on small screens - large blur radii are the most
+               expensive part of this effect on mobile GPUs. */
+            @media (max-width: 768px) {
+                .left-half .blob  { filter: blur(38px); }
+                .right-half .blob { filter: blur(42px); }
+                .left-half .sheen  { filter: blur(60px); }
+                .right-half .sheen { filter: blur(65px); }
+            }
+
+            /* Honour the OS "reduce motion" setting: keep the texture, drop
+               the movement. */
+            @media (prefers-reduced-motion: reduce) {
+                .blob, .sheen { animation: none !important; }
+            }
         </style>
     </head>
     <body>
         <div class="container">
             <!-- Split Fluid Backgrounds -->
-            <div class="left-half"></div>
-            <div class="right-half"></div>
+            <div class="half left-half">
+                <div class="fluid">
+                    <div class="blob l1"></div>
+                    <div class="blob l2"></div>
+                    <div class="blob l3"></div>
+                    <div class="blob l4"></div>
+                    <div class="blob l5"></div>
+                    <div class="sheen"></div>
+                </div>
+            </div>
+
+            <div class="half right-half">
+                <div class="fluid">
+                    <div class="blob d1"></div>
+                    <div class="blob d2"></div>
+                    <div class="blob d3"></div>
+                    <div class="blob d4"></div>
+                    <div class="blob d5"></div>
+                    <div class="sheen"></div>
+                </div>
+            </div>
+
+            <!-- Kinetic fluid shader (drawn over the CSS fallback) -->
+            <canvas id="fluid-canvas" aria-hidden="true"></canvas>
 
             <!-- Centered Logo -->
             <div class="logo-container">
@@ -126,5 +327,285 @@
             <!-- Footer Intrigue -->
             <div class="footer-text">Roze Ventures</div>
         </div>
+
+        <script>
+        (function () {
+            'use strict';
+
+            /* ===============================================================
+               KINETIC FLUIDS - tuning knobs
+               Dial these to taste; they map straight onto shader uniforms.
+               =============================================================== */
+            var CONFIG = {
+                speed:       0.03,  // overall flow rate. higher = more aggressive
+                scale:       0.50,  // pattern zoom. lower = larger, lazier forms
+                warp:        5.00,  // domain-warp strength. THIS is the swirl.
+                veinFreq:    1.50,  // how many vein bands fold through the field
+                veinSharp:   1.50,  // vein thinness. higher = finer, harder edges
+                veinLight:   0.35,  // vein strength, pearl side
+                veinDark:    0.25,  // vein strength, ink side
+                contrast:    2.0   // tonal separation
+            };
+
+            var canvas = document.getElementById('fluid-canvas');
+            var container = document.querySelector('.container');
+            if (!canvas || !container) { return; }
+
+            var gl = null;
+            try {
+                var attrs = { alpha: false, antialias: false, depth: false, stencil: false,
+                              powerPreference: 'high-performance', preserveDrawingBuffer: false };
+                gl = canvas.getContext('webgl', attrs) || canvas.getContext('experimental-webgl', attrs);
+            } catch (e) { gl = null; }
+
+            /* No WebGL -> leave the CSS blob fallback on screen and bail out. */
+            if (!gl) {
+                canvas.parentNode && canvas.parentNode.removeChild(canvas);
+                return;
+            }
+
+            var reduceMotion = window.matchMedia &&
+                window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            /* Small screens and low-core devices get a cheaper noise stack. */
+            var lowPower = (navigator.hardwareConcurrency || 4) <= 4 ||
+                           Math.min(screen.width, screen.height) <= 480;
+            var OCTAVES = lowPower ? 3 : 5;
+
+            var VERT = [
+                'attribute vec2 aPos;',
+                'void main(){ gl_Position = vec4(aPos, 0.0, 1.0); }'
+            ].join('\n');
+
+            var FRAG = [
+                'precision highp float;',
+                '#define OCTAVES ' + OCTAVES,
+                'uniform vec2  uRes;',
+                'uniform float uTime;',
+                'uniform float uScale;',
+                'uniform float uWarp;',
+                'uniform float uVeinFreq;',
+                'uniform float uVeinSharp;',
+                'uniform float uVeinLight;',
+                'uniform float uVeinDark;',
+                'uniform float uContrast;',
+
+                /* --- value noise ------------------------------------------ */
+                'float hash(vec2 p){',
+                '  p = fract(p * vec2(123.34, 456.21));',
+                '  p += dot(p, p + 45.32);',
+                '  return fract(p.x * p.y);',
+                '}',
+                'float noise(vec2 p){',
+                '  vec2 i = floor(p), f = fract(p);',
+                '  vec2 u = f * f * (3.0 - 2.0 * f);',
+                '  float a = hash(i);',
+                '  float b = hash(i + vec2(1.0, 0.0));',
+                '  float c = hash(i + vec2(0.0, 1.0));',
+                '  float d = hash(i + vec2(1.0, 1.0));',
+                '  return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);',
+                '}',
+                /* rotated-lattice fbm: the rotation kills axis-aligned artefacts */
+                'float fbm(vec2 p){',
+                '  float s = 0.0, a = 0.5;',
+                '  mat2 m = mat2(1.6, 1.2, -1.2, 1.6);',
+                '  for (int i = 0; i < OCTAVES; i++){',
+                '    s += a * noise(p);',
+                '    p = m * p;',
+                '    a *= 0.5;',
+                '  }',
+                '  return s;',
+                '}',
+
+                'void main(){',
+                '  vec2 uv = gl_FragCoord.xy / uRes.xy;',
+                '  vec2 p  = vec2(uv.x * (uRes.x / uRes.y), uv.y) * uScale;',
+                '  float t = uTime;',
+
+                /* --- domain warping: fbm of fbm of fbm.
+                       Each pass folds the field into the next, which is what
+                       turns smooth noise into liquid marbling. ------------- */
+                '  vec2 q = vec2( fbm(p + vec2(0.0, 0.0) + t * 0.16),',
+                '                 fbm(p + vec2(5.2, 1.3) - t * 0.13) );',
+                '  vec2 r = vec2( fbm(p + uWarp * q + vec2(1.7, 9.2) + t * 0.20),',
+                '                 fbm(p + uWarp * q + vec2(8.3, 2.8) - t * 0.17) );',
+                '  float v = fbm(p + uWarp * r + t * 0.06);',
+
+                '  float warpAmt = length(r);',
+                '  float tone = clamp((v - 0.5) * uContrast + 0.5, 0.0, 1.0);',
+                '  tone = smoothstep(0.30, 0.90, tone);',
+
+                /* --- veins: fold the field into repeating bands, then take a
+                       ridge of each band. this is the marble vein. --------- */
+                '  float bands = fract(v * uVeinFreq + warpAmt * 0.85);',
+                '  float vein  = pow(1.0 - abs(2.0 * bands - 1.0), uVeinSharp);',
+
+                /* --- pearl half ------------------------------------------- */
+                '  vec3 light = mix(vec3(0.815, 0.805, 0.815),',
+                '                   vec3(0.996, 0.994, 0.989), tone);',
+                '  light = mix(light, vec3(0.505, 0.495, 0.525), vein * uVeinLight);',
+                /* Pearl iridescence: rose -> cool blue -> gold. Deliberately
+                   NOT a full spectrum sweep, which drifts through green and
+                   reads as dirty rather than pearlescent. */
+                '  float ph = warpAmt * 3.4;',
+                '  vec3 irid = mix(vec3(1.032, 0.972, 0.997),',
+                '                  vec3(0.972, 0.991, 1.036), 0.5 + 0.5 * sin(ph));',
+                '  irid = mix(irid, vec3(1.030, 1.008, 0.949), 0.35 + 0.35 * sin(ph * 0.62 + 1.7));',
+                '  light *= mix(vec3(1.0), irid, 0.90);',
+
+                /* --- ink half --------------------------------------------- */
+                '  vec3 dark = mix(vec3(0.008, 0.008, 0.012),',
+                '                  vec3(0.105, 0.105, 0.128), tone);',
+                '  dark = mix(dark, vec3(0.880, 0.890, 0.935), vein * uVeinDark);',
+                '  dark += vec3(0.030, 0.034, 0.048) * pow(tone, 3.0);',
+
+                /* --- the split, antialiased across one pixel --------------- */
+                '  float px = 0.75 / uRes.x;',
+                '  float side = smoothstep(0.5 - px, 0.5 + px, uv.x);',
+                '  vec3 col = mix(light, dark, side);',
+
+                /* --- dither: without this the dark half bands visibly ------ */
+                '  col += (hash(gl_FragCoord.xy * 0.7) - 0.5) * 0.016;',
+
+                '  gl_FragColor = vec4(col, 1.0);',
+                '}'
+            ].join('\n');
+
+            function compile(type, src) {
+                var s = gl.createShader(type);
+                gl.shaderSource(s, src);
+                gl.compileShader(s);
+                if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+                    console.error('[fluid] shader compile failed:', gl.getShaderInfoLog(s));
+                    gl.deleteShader(s);
+                    return null;
+                }
+                return s;
+            }
+
+            var vs = compile(gl.VERTEX_SHADER, VERT);
+            var fs = compile(gl.FRAGMENT_SHADER, FRAG);
+            if (!vs || !fs) {
+                canvas.parentNode && canvas.parentNode.removeChild(canvas);
+                return;
+            }
+
+            var prog = gl.createProgram();
+            gl.attachShader(prog, vs);
+            gl.attachShader(prog, fs);
+            gl.linkProgram(prog);
+            if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+                console.error('[fluid] link failed:', gl.getProgramInfoLog(prog));
+                canvas.parentNode && canvas.parentNode.removeChild(canvas);
+                return;
+            }
+            gl.useProgram(prog);
+
+            /* One oversized triangle covers the viewport with no seam. */
+            var buf = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+            var aPos = gl.getAttribLocation(prog, 'aPos');
+            gl.enableVertexAttribArray(aPos);
+            gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+            var U = {};
+            ['uRes','uTime','uScale','uWarp','uVeinFreq','uVeinSharp',
+             'uVeinLight','uVeinDark','uContrast'].forEach(function (n) {
+                U[n] = gl.getUniformLocation(prog, n);
+            });
+
+            gl.uniform1f(U.uScale,     CONFIG.scale);
+            gl.uniform1f(U.uWarp,      CONFIG.warp);
+            gl.uniform1f(U.uVeinFreq,  CONFIG.veinFreq);
+            gl.uniform1f(U.uVeinSharp, CONFIG.veinSharp);
+            gl.uniform1f(U.uVeinLight, CONFIG.veinLight);
+            gl.uniform1f(U.uVeinDark,  CONFIG.veinDark);
+            gl.uniform1f(U.uContrast,  CONFIG.contrast);
+
+            /* Resolution budget: fluid upscales cleanly, so cap total pixels
+               rather than blindly honouring devicePixelRatio on 5K displays. */
+            var PIXEL_BUDGET = lowPower ? 900000 : 2100000;
+            var resScale = 1.0;
+
+            function resize() {
+                var w = container.clientWidth || window.innerWidth;
+                var h = container.clientHeight || window.innerHeight;
+                var dpr = Math.min(window.devicePixelRatio || 1, 2);
+                var cw = w * dpr * resScale;
+                var ch = h * dpr * resScale;
+                var over = (cw * ch) / PIXEL_BUDGET;
+                if (over > 1) { var k = Math.sqrt(over); cw /= k; ch /= k; }
+                cw = Math.max(1, Math.round(cw));
+                ch = Math.max(1, Math.round(ch));
+                if (canvas.width !== cw || canvas.height !== ch) {
+                    canvas.width = cw;
+                    canvas.height = ch;
+                    gl.viewport(0, 0, cw, ch);
+                    gl.uniform2f(U.uRes, cw, ch);
+                }
+            }
+            resize();
+            window.addEventListener('resize', resize);
+            window.addEventListener('orientationchange', resize);
+
+            container.classList.add('gl-active');
+
+            /* --- frame loop ------------------------------------------------ */
+            var start = null, raf = null, shown = false;
+            var samples = 0, accum = 0, downshifted = false;
+
+            function frame(now) {
+                if (start === null) { start = now; }
+                var t = ((now - start) / 1000) * CONFIG.speed;
+                gl.uniform1f(U.uTime, t);
+                gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+                if (!shown) { shown = true; canvas.classList.add('ready'); }
+
+                /* If the first ~40 frames run slow, drop resolution once. */
+                if (!downshifted && samples < 40) {
+                    if (window.__fluidLast) { accum += now - window.__fluidLast; samples++; }
+                    window.__fluidLast = now;
+                    if (samples === 40 && (accum / samples) > 23) {
+                        downshifted = true;
+                        resScale = 0.7;
+                        resize();
+                    }
+                }
+                raf = requestAnimationFrame(frame);
+            }
+
+            if (reduceMotion) {
+                /* Keep the marbling, drop the motion. */
+                resize();
+                gl.uniform1f(U.uTime, 9.0);
+                gl.drawArrays(gl.TRIANGLES, 0, 3);
+                canvas.classList.add('ready');
+            } else {
+                raf = requestAnimationFrame(frame);
+                document.addEventListener('visibilitychange', function () {
+                    if (document.hidden) {
+                        if (raf) { cancelAnimationFrame(raf); raf = null; }
+                    } else if (!raf) {
+                        /* Rebase the clock so it resumes instead of jumping. */
+                        var pausedAt = performance.now();
+                        start = pausedAt - (start === null ? 0 : (pausedAt - start));
+                        raf = requestAnimationFrame(frame);
+                    }
+                });
+            }
+
+            /* Recover gracefully if the GPU process restarts. */
+            canvas.addEventListener('webglcontextlost', function (e) {
+                e.preventDefault();
+                if (raf) { cancelAnimationFrame(raf); raf = null; }
+                container.classList.remove('gl-active');
+                canvas.classList.remove('ready');
+            });
+
+            window.RozeFluid = { config: CONFIG, uniforms: U, gl: gl, program: prog };
+        })();
+        </script>
     </body>
 </html>
